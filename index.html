@@ -31,7 +31,7 @@
 
         .item-row { background: #252729; padding: 12px; border-radius: 6px; border: 1px solid #444; margin-bottom: 10px; position: relative; }
         .btn-remove-item { background: #e74c3c; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; float: right; margin-bottom: 5px; }
-        .btn-add-item { background: #3498db; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 13px; margin-bottom: 15px; font-weight: bold; }
+        .btn-add-item { background: #3498db; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 13px; margin-bottom: 15px; font-weight: bold; width: 100%; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; min-width: 600px; }
         th, td { padding: 10px; text-align: left; border-bottom: 1px solid #7f8c8d; }
@@ -44,6 +44,14 @@
         .card { background: #1e1e1e; border: 1px solid #7f8c8d; border-radius: 8px; padding: 15px; text-align: center; }
         .card h4 { color: #bdc3c7; font-size: 13px; margin-bottom: 8px; }
         .card .value { font-size: 20px; font-weight: bold; color: #2ecc71; }
+
+        /* RESPONSIF KHUSUS HP (Layar di bawah 768px) */
+        @media screen and (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 2px solid #2ecc71; padding: 15px; }
+            .menu-btn { display: inline-block; width: auto; margin-right: 5px; margin-bottom: 5px; padding: 10px 12px; font-size: 14px; }
+            .main-content { padding: 15px; width: 100%; }
+        }
 
         #print-area {
             display: none;
@@ -85,9 +93,7 @@
                 <hr style="border-color: #444; margin: 20px 0;">
                 <label style="color: #2ecc71; font-weight: bold; margin-bottom: 10px; display: block;">Daftar Sepatu / Treatment</label>
                 
-                <div id="item-container">
-                    <!-- Item baris pertama akan muncul otomatis -->
-                </div>
+                <div id="item-container"></div>
 
                 <button type="button" class="btn-add-item" onclick="tambahBarisItem()">+ Tambah Sepatu / Treatment Lain</button>
 
@@ -168,10 +174,12 @@
                 <button type="submit" class="btn-submit">Simpan Pengeluaran</button>
             </form>
             <h3>Daftar Pengeluaran</h3>
-            <table>
-                <thead><tr><th>Tanggal</th><th>Keterangan</th><th>Total</th><th>Sumber</th><th>Aksi</th></tr></thead>
-                <tbody id="tabel-pengeluaran-body"></tbody>
-            </table>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead><tr><th>Tanggal</th><th>Keterangan</th><th>Total</th><th>Sumber</th><th>Aksi</th></tr></thead>
+                    <tbody id="tabel-pengeluaran-body"></tbody>
+                </table>
+            </div>
         </div>
 
         <!-- TAB 4: CASHFLOW -->
@@ -193,7 +201,9 @@
                 <button type="submit" class="btn-submit">Simpan Promo</button>
             </form>
             <h3>Daftar Promo</h3>
-            <table><thead><tr><th>Kode</th><th>Potongan</th><th>Aksi</th></tr></thead><tbody id="tabel-promo-body"></tbody></table>
+            <div style="overflow-x: auto;">
+                <table><thead><tr><th>Kode</th><th>Potongan</th><th>Aksi</th></tr></thead><tbody id="tabel-promo-body"></tbody></table>
+            </div>
         </div>
 
     </div>
@@ -222,10 +232,7 @@
             <span>AMOUNT</span>
         </div>
 
-        <!-- Daftar Item Dinamis di Nota -->
-        <div id="print-items-list" style="margin-bottom: 15px;">
-            <!-- Diisi lewat Javascript -->
-        </div>
+        <div id="print-items-list" style="margin-bottom: 15px;"></div>
 
         <div id="row-oneday" style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; color: #bdc3c7; display: none;">
             <span>One Day Service</span>
@@ -285,7 +292,6 @@
             else if(tabName === 'cashflow') muatCashflow();
         }
 
-        // Fungsi Tambah Baris Input Item di Form Transaksi
         function tambahBarisItem(warnaVal = '', layananVal = '', hargaVal = 0) {
             const container = document.getElementById('item-container');
             const rowId = 'item-row-' + Date.now() + Math.random();
@@ -408,7 +414,6 @@
             });
         }
 
-        // Proses Cetak/Buka Nota Multi-Item
         function bukaNotaBaru(rowIndex) {
             const t = daftarTransaksi.find(item => item.rowIndex === rowIndex);
             if(!t) return;
@@ -422,15 +427,9 @@
             document.getElementById('print-status').innerText = t.status || 'PAID';
             document.getElementById('print-total').innerText = parseFloat(t.total).toLocaleString('id-ID');
 
-            // Render daftar item multi-item ke dalam kotak nota
             const itemsListContainer = document.getElementById('print-items-list');
-            itemsListContainer.innerHTML = '';
-
-            // Format data layanan yang digabungkan dari baris transaksi
-            // Misal format tersimpan: "Nike Putih (Deep Clean Premium - Rp 50.000), Adidas Hitam (Standar Cleaning - Rp 30.000)"
             itemsListContainer.innerHTML = `<div style="font-size: 14px; line-height: 1.6; color: #fff; white-space: pre-line;">${t.layanan}</div>`;
 
-            // Atur tambahan One Day & Promo di Nota
             if (t.oneday && t.oneday.includes('Ya')) {
                 document.getElementById('row-oneday').style.display = 'flex';
                 document.getElementById('print-oneday-harga').innerText = '15.000';
@@ -476,7 +475,6 @@
             const namaVal = document.getElementById('nama').value;
             const nowaVal = document.getElementById('nowa').value;
             
-            // Kumpulkan semua item sepatu & layanan
             let gabunganLayananArr = [];
             let totalHargaDasar = 0;
 
@@ -521,7 +519,7 @@
                 alert('Transaksi Multi-Item berhasil disimpan!');
                 document.getElementById('form-transaksi').reset();
                 document.getElementById('item-container').innerHTML = '';
-                tambahBarisItem(); // Reset ke 1 baris kosong
+                tambahBarisItem();
                 btn.textContent = "Simpan & Buka Nota";
                 btn.disabled = false;
 
@@ -530,7 +528,6 @@
             });
         }
 
-        // Inisialisasi awal 1 baris item saat halaman dibuka
         tambahBarisItem();
         muatPromo();
     </script>
