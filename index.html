@@ -45,7 +45,6 @@
         .card h4 { color: #bdc3c7; font-size: 13px; margin-bottom: 8px; }
         .card .value { font-size: 20px; font-weight: bold; color: #2ecc71; }
 
-        /* RESPONSIF KHUSUS HP (Layar di bawah 768px) */
         @media screen and (max-width: 768px) {
             body { flex-direction: column; }
             .sidebar { width: 100%; border-right: none; border-bottom: 2px solid #2ecc71; padding: 15px; }
@@ -232,6 +231,7 @@
             <span>AMOUNT</span>
         </div>
 
+        <!-- Daftar Item Kiri-Kanan -->
         <div id="print-items-list" style="margin-bottom: 15px;"></div>
 
         <div id="row-oneday" style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; color: #bdc3c7; display: none;">
@@ -382,7 +382,7 @@
                             <td>${t.tanggal}</td>
                             <td>${t.nama}</td>
                             <td>${t.nowa}</td>
-                            <td>${t.layanan}</td>
+                            <td>${t.layanan.replace(/<br>/g, ', ')}</td>
                             <td>Rp ${parseFloat(t.total).toLocaleString('id-ID')}</td>
                             <td>${t.status}</td>
                             <td><button class="btn-print" onclick="bukaNotaBaru(${t.rowIndex})">Nota</button></td>
@@ -428,7 +428,7 @@
             document.getElementById('print-total').innerText = parseFloat(t.total).toLocaleString('id-ID');
 
             const itemsListContainer = document.getElementById('print-items-list');
-            itemsListContainer.innerHTML = `<div style="font-size: 14px; line-height: 1.6; color: #fff; white-space: pre-line;">${t.layanan}</div>`;
+            itemsListContainer.innerHTML = t.layanan; // Sudah berformat baris HTML sejajar kiri-kanan
 
             if (t.oneday && t.oneday.includes('Ya')) {
                 document.getElementById('row-oneday').style.display = 'flex';
@@ -475,19 +475,26 @@
             const namaVal = document.getElementById('nama').value;
             const nowaVal = document.getElementById('nowa').value;
             
-            let gabunganLayananArr = [];
+            let gabunganHtmlArr = [];
             let totalHargaDasar = 0;
 
             const rows = document.querySelectorAll('.item-row');
             rows.forEach(row => {
                 const warna = row.querySelector('.item-warna').value;
                 const layanan = row.querySelector('.item-layanan').value;
-                const harga = row.querySelector('.item-harga').value;
-                gabunganLayananArr.push(`• ${warna} (${layanan} - Rp ${parseFloat(harga).toLocaleString('id-ID')})`);
-                totalHargaDasar += parseFloat(harga) || 0;
+                const harga = parseFloat(row.querySelector('.item-harga').value) || 0;
+                
+                // Format HTML baris per baris agar item di kiri dan harga pas di bawah AMOUNT
+                gabunganHtmlArr.push(`
+                    <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px;">
+                        <span>• ${warna} (${layanan})</span>
+                        <span>Rp ${harga.toLocaleString('id-ID')}</span>
+                    </div>
+                `);
+                totalHargaDasar += harga;
             });
 
-            const textLayananGabungan = gabunganLayananArr.join('\n');
+            const textHtmlGabungan = gabunganHtmlArr.join('');
 
             const onedaySelect = document.getElementById('pilih-oneday');
             const onedayText = onedaySelect.value === "15000" ? "Ya (+Rp 15.000)" : "Tidak";
@@ -506,7 +513,7 @@
                 nama: namaVal,
                 nowa: nowaVal,
                 warna: "Multi-Item",
-                layanan: textLayananGabungan,
+                layanan: textHtmlGabungan,
                 harga: totalHargaDasar,
                 oneday: onedayText,
                 promo: promoText,
