@@ -29,9 +29,9 @@
         .btn-submit { background-color: #2ecc71; color: #1e1e1e; padding: 12px 20px; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
         .btn-submit:hover { background-color: #27ae60; }
 
-        .item-row { background: #252729; padding: 12px; border-radius: 6px; border: 1px solid #444; margin-bottom: 10px; position: relative; }
-        .btn-remove-item { background: #e74c3c; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; float: right; margin-bottom: 5px; }
-        .btn-add-item { background: #3498db; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 13px; margin-bottom: 15px; font-weight: bold; width: 100%; }
+        .item-row { background: #252729; padding: 15px; border-radius: 6px; border: 1px solid #444; margin-bottom: 12px; position: relative; }
+        .btn-remove-item { background: #e74c3c; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; float: right; }
+        .btn-add-item { background: #3498db; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-size: 14px; margin-bottom: 20px; font-weight: bold; width: 100%; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; min-width: 600px; }
         th, td { padding: 10px; text-align: left; border-bottom: 1px solid #7f8c8d; }
@@ -78,7 +78,7 @@
         
         <!-- TAB 1: INPUT TRANSAKSI -->
         <div id="transaksi" class="tab-content active">
-            <h3>Input Transaksi Baru (Bisa Banyak Item)</h3>
+            <h3>Input Transaksi (Treatment & Quantity)</h3>
             <form id="form-transaksi" onsubmit="simpanTransaksi(event)">
                 <div class="form-group">
                     <label>Nama Pelanggan</label>
@@ -88,13 +88,17 @@
                     <label>No. WhatsApp</label>
                     <input type="text" id="nowa" placeholder="Contoh: 0811..." required>
                 </div>
+                <div class="form-group">
+                    <label>Warna / Brand Sepatu</label>
+                    <input type="text" id="warna" placeholder="Contoh: Nike / Putih" required>
+                </div>
 
                 <hr style="border-color: #444; margin: 20px 0;">
-                <label style="color: #2ecc71; font-weight: bold; margin-bottom: 10px; display: block;">Daftar Sepatu / Treatment</label>
+                <label style="color: #2ecc71; font-weight: bold; margin-bottom: 10px; display: block;">Daftar Treatment & Quantity</label>
                 
                 <div id="item-container"></div>
 
-                <button type="button" class="btn-add-item" onclick="tambahBarisItem()">+ Tambah Sepatu / Treatment Lain</button>
+                <button type="button" class="btn-add-item" onclick="tambahBarisItem()">+ Tambah Jenis Treatment Lain</button>
 
                 <div class="form-group" style="margin-top: 15px;">
                     <label>One Day Service</label>
@@ -137,14 +141,15 @@
                             <th>Tanggal</th>
                             <th>Nama</th>
                             <th>No WA</th>
-                            <th>Detail Sepatu / Layanan</th>
+                            <th>Warna/Brand</th>
+                            <th>Detail Treatment</th>
                             <th>Total</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="tabel-pelanggan-body">
-                        <tr><td colspan="7" style="text-align: center;">Memuat data...</td></tr>
+                        <tr><td colspan="8" style="text-align: center;">Memuat data...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -207,68 +212,71 @@
 
     </div>
 
-    <!-- AREA TEMPLAT INVOICE MULTI-ITEM (GAMBAR) -->
+    <!-- AREA TEMPLAT INVOICE (GAMBAR) -->
     <div id="print-area">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
             <h1 style="font-size: 24px; font-weight: bold; letter-spacing: 0.5px; white-space: nowrap;">
                 <span style="color: #2ecc71;">&lt;/</span><span style="color: #ffffff;">BAR SHOESCARE</span><span style="color: #2ecc71;">&gt;</span>
             </h1>
             <h2 style="color: #2ecc71; font-size: 24px; font-weight: normal; letter-spacing: 1px;">INVOICE</h2>
         </div>
 
-        <div style="margin-bottom: 25px;">
-            <p style="color: #2ecc71; font-size: 15px; margin-bottom: 10px; font-weight: bold;">CUSTOMER INFO</p>
-            <div style="border-bottom: 1px solid #7f8c8d; padding-bottom: 5px; margin-bottom: 8px; font-size: 15px;">
+        <div style="margin-bottom: 20px;">
+            <p style="color: #2ecc71; font-size: 14px; margin-bottom: 8px; font-weight: bold;">CUSTOMER INFO</p>
+            <div style="border-bottom: 1px solid #7f8c8d; padding-bottom: 4px; margin-bottom: 6px; font-size: 14px;">
                 <span id="print-nama" style="color: #fff;">Nama Pelanggan</span>
             </div>
-            <div style="border-bottom: 1px solid #7f8c8d; padding-bottom: 5px; font-size: 15px;">
+            <div style="border-bottom: 1px solid #7f8c8d; padding-bottom: 4px; margin-bottom: 6px; font-size: 14px;">
                 <span id="print-nowa" style="color: #fff;">No WhatsApp</span>
+            </div>
+            <div style="border-bottom: 1px solid #7f8c8d; padding-bottom: 4px; font-size: 14px;">
+                <span id="print-warna" style="color: #fff;">Warna / Brand Sepatu</span>
             </div>
         </div>
 
-        <div style="display: flex; justify-content: space-between; color: #2ecc71; font-size: 15px; font-weight: bold; border-bottom: 1px solid #7f8c8d; padding-bottom: 8px; margin-bottom: 12px;">
-            <span>ITEM & TREATMENT</span>
+        <div style="display: flex; justify-content: space-between; color: #2ecc71; font-size: 14px; font-weight: bold; border-bottom: 1px solid #7f8c8d; padding-bottom: 6px; margin-bottom: 10px;">
+            <span>QUANTITY & TREATMENT</span>
             <span>AMOUNT</span>
         </div>
 
         <!-- Daftar Item Kiri-Kanan -->
         <div id="print-items-list" style="margin-bottom: 15px;"></div>
 
-        <div id="row-oneday" style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; color: #bdc3c7; display: none;">
+        <div id="row-oneday" style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; color: #bdc3c7; display: none;">
             <span>One Day Service</span>
             <span>Rp <span id="print-oneday-harga">0</span></span>
         </div>
 
-        <div id="row-promo" style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 15px; color: #e74c3c; display: none;">
+        <div id="row-promo" style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 15px; color: #e74c3c; display: none;">
             <span id="print-promo-label">Promo Diskon</span>
             <span>- Rp <span id="print-promo-potongan">0</span></span>
         </div>
 
-        <div style="border-bottom: 1px solid #7f8c8d; margin-bottom: 20px;"></div>
+        <div style="border-bottom: 1px solid #7f8c8d; margin-bottom: 15px;"></div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px;">
-            <div style="font-size: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <div style="font-size: 15px;">
                 <strong style="color: #bdc3c7;">Status:</strong> <span id="print-status" style="color: #2ecc71; font-weight: bold;">PAID</span>
             </div>
             <div style="text-align: right;">
-                <span style="color: #2ecc71; font-size: 15px; font-weight: bold; margin-right: 12px;">Total</span>
-                <span style="color: #2ecc71; font-size: 20px; font-weight: bold;">Rp <span id="print-total">0</span></span>
+                <span style="color: #2ecc71; font-size: 14px; font-weight: bold; margin-right: 10px;">Total</span>
+                <span style="color: #2ecc71; font-size: 18px; font-weight: bold;">Rp <span id="print-total">0</span></span>
             </div>
         </div>
 
-        <div style="margin-bottom: 40px;">
-            <p style="color: #2ecc71; font-size: 14px; font-weight: bold; margin-bottom: 6px;">Terms And Conditions</p>
-            <ol style="color: #bdc3c7; font-size: 12px; padding-left: 18px; line-height: 1.5;">
+        <div style="margin-bottom: 30px;">
+            <p style="color: #2ecc71; font-size: 13px; font-weight: bold; margin-bottom: 5px;">Terms And Conditions</p>
+            <ol style="color: #bdc3c7; font-size: 11px; padding-left: 15px; line-height: 1.4;">
                 <li>Kerusakan bawaan sebelum dicuci bukan tanggung jawab Bar Shoescare.</li>
                 <li>Sepatu tidak diambil &gt;30 hari di luar tanggung jawab kami.</li>
             </ol>
         </div>
 
-        <div style="text-align: center; color: #bdc3c7; font-size: 13px; margin-bottom: 40px;">
+        <div style="text-align: center; color: #bdc3c7; font-size: 12px; margin-bottom: 30px;">
             Thank you for trusting Bar Shoescare.
         </div>
 
-        <div style="display: flex; justify-content: space-between; font-size: 13px; color: #bdc3c7;">
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #bdc3c7;">
             <span>IG/TIKTOK : barshoescare</span>
             <span>Whatsapp: 081159230600</span>
         </div>
@@ -292,7 +300,7 @@
             else if(tabName === 'cashflow') muatCashflow();
         }
 
-        function tambahBarisItem(warnaVal = '', layananVal = '', hargaVal = 0) {
+        function tambahBarisItem(layananVal = 'Standar Cleaning', qtyVal = 1) {
             const container = document.getElementById('item-container');
             const rowId = 'item-row-' + Date.now() + Math.random();
             
@@ -300,31 +308,21 @@
             div.className = 'item-row';
             div.id = rowId;
             div.innerHTML = `
-                <button type="button" class="btn-remove-item" onclick="document.getElementById('${rowId}').remove(); hitungTotal();">Hapus Item</button>
+                <button type="button" class="btn-remove-item" onclick="document.getElementById('${rowId}').remove(); hitungTotal();">Hapus</button>
                 <div class="form-group" style="margin-bottom: 8px;">
-                    <label>Brand / Warna Sepatu</label>
-                    <input type="text" class="item-warna" placeholder="Contoh: Nike Putih" value="${warnaVal}" required oninput="hitungTotal()">
-                </div>
-                <div class="form-group" style="margin-bottom: 5px;">
                     <label>Layanan (Treatment)</label>
-                    <select class="item-layanan" onchange="updateHargaItem(this)" required>
-                        <option value="" data-price="0" disabled ${!layananVal ? 'selected' : ''}>-- Pilih Layanan --</option>
+                    <select class="item-layanan" onchange="hitungTotal()" required>
                         <option value="Standar Cleaning" data-price="30000" ${layananVal === 'Standar Cleaning' ? 'selected' : ''}>Standar Cleaning (Rp 30.000)</option>
                         <option value="Deep Clean Standar" data-price="40000" ${layananVal === 'Deep Clean Standar' ? 'selected' : ''}>Deep Clean Standar (Rp 40.000)</option>
                         <option value="Deep Clean Premium" data-price="50000" ${layananVal === 'Deep Clean Premium' ? 'selected' : ''}>Deep Clean Premium (Rp 50.000)</option>
                     </select>
                 </div>
-                <input type="hidden" class="item-harga" value="${hargaVal}">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Quantity (Jumlah Pasang)</label>
+                    <input type="number" class="item-qty" value="${qtyVal}" min="1" required oninput="hitungTotal()">
+                </div>
             `;
             container.appendChild(div);
-            hitungTotal();
-        }
-
-        function updateHargaItem(selectElement) {
-            const selectedOption = selectElement.options[selectElement.selectedIndex];
-            const harga = selectedOption.getAttribute('data-price') || 0;
-            const row = selectElement.closest('.item-row');
-            row.querySelector('.item-harga').value = harga;
             hitungTotal();
         }
 
@@ -332,7 +330,10 @@
             let totalSub = 0;
             const rows = document.querySelectorAll('.item-row');
             rows.forEach(row => {
-                totalSub += parseFloat(row.querySelector('.item-harga').value) || 0;
+                const selectOpt = row.querySelector('.item-layanan');
+                const hargaSatuan = parseFloat(selectOpt.selectedOptions[0].getAttribute('data-price')) || 0;
+                const qty = parseInt(row.querySelector('.item-qty').value) || 1;
+                totalSub += hargaSatuan * qty;
             });
 
             const biayaOneDay = parseFloat(document.getElementById('pilih-oneday').value) || 0;
@@ -373,7 +374,7 @@
                 const tbody = document.getElementById('tabel-pelanggan-body');
                 tbody.innerHTML = '';
                 if(data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">Belum ada data.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="8" style="text-align: center;">Belum ada data.</td></tr>`;
                     return;
                 }
                 data.forEach((t) => {
@@ -382,6 +383,7 @@
                             <td>${t.tanggal}</td>
                             <td>${t.nama}</td>
                             <td>${t.nowa}</td>
+                            <td>${t.warna}</td>
                             <td>${t.layanan.replace(/<br>/g, ', ')}</td>
                             <td>Rp ${parseFloat(t.total).toLocaleString('id-ID')}</td>
                             <td>${t.status}</td>
@@ -424,11 +426,12 @@
         function renderNotaHtml(t) {
             document.getElementById('print-nama').innerText = t.nama;
             document.getElementById('print-nowa').innerText = t.nowa;
+            document.getElementById('print-warna').innerText = t.warna || '-';
             document.getElementById('print-status').innerText = t.status || 'PAID';
             document.getElementById('print-total').innerText = parseFloat(t.total).toLocaleString('id-ID');
 
             const itemsListContainer = document.getElementById('print-items-list');
-            itemsListContainer.innerHTML = t.layanan; // Sudah berformat baris HTML sejajar kiri-kanan
+            itemsListContainer.innerHTML = t.layanan;
 
             if (t.oneday && t.oneday.includes('Ya')) {
                 document.getElementById('row-oneday').style.display = 'flex';
@@ -474,24 +477,26 @@
 
             const namaVal = document.getElementById('nama').value;
             const nowaVal = document.getElementById('nowa').value;
+            const warnaVal = document.getElementById('warna').value;
             
             let gabunganHtmlArr = [];
             let totalHargaDasar = 0;
 
             const rows = document.querySelectorAll('.item-row');
             rows.forEach(row => {
-                const warna = row.querySelector('.item-warna').value;
-                const layanan = row.querySelector('.item-layanan').value;
-                const harga = parseFloat(row.querySelector('.item-harga').value) || 0;
+                const selectOpt = row.querySelector('.item-layanan');
+                const layananName = selectOpt.value;
+                const hargaSatuan = parseFloat(selectOpt.selectedOptions[0].getAttribute('data-price')) || 0;
+                const qty = parseInt(row.querySelector('.item-qty').value) || 1;
+                const subtotal = hargaSatuan * qty;
                 
-                // Format HTML baris per baris agar item di kiri dan harga pas di bawah AMOUNT
                 gabunganHtmlArr.push(`
                     <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px;">
-                        <span>• ${warna} (${layanan})</span>
-                        <span>Rp ${harga.toLocaleString('id-ID')}</span>
+                        <span>${qty}x ${layananName}</span>
+                        <span>Rp ${subtotal.toLocaleString('id-ID')}</span>
                     </div>
                 `);
-                totalHargaDasar += harga;
+                totalHargaDasar += subtotal;
             });
 
             const textHtmlGabungan = gabunganHtmlArr.join('');
@@ -512,7 +517,7 @@
                 type: "transaksi",
                 nama: namaVal,
                 nowa: nowaVal,
-                warna: "Multi-Item",
+                warna: warnaVal,
                 layanan: textHtmlGabungan,
                 harga: totalHargaDasar,
                 oneday: onedayText,
@@ -523,7 +528,7 @@
 
             fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
             .then(() => {
-                alert('Transaksi Multi-Item berhasil disimpan!');
+                alert('Transaksi berhasil disimpan!');
                 document.getElementById('form-transaksi').reset();
                 document.getElementById('item-container').innerHTML = '';
                 tambahBarisItem();
