@@ -138,7 +138,36 @@
 
         <!-- TAB 2: DATA PELANGGAN -->
         <div id="pelanggan" class="tab-content">
-            <h3>Daftar Pelanggan & Transaksi</h3>
+            <h3>Daftar Pelanggan & Transaksi Bulanan</h3>
+            
+            <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 150px;">
+                    <label>Pilih Bulan</label>
+                    <select id="filter-bulan-pelanggan" onchange="muatTransaksi()">
+                        <option value="01">Januari</option>
+                        <option value="02">Februari</option>
+                        <option value="03">Maret</option>
+                        <option value="04">April</option>
+                        <option value="05">Mei</option>
+                        <option value="06">Juni</option>
+                        <option value="07">Juli</option>
+                        <option value="08">Agustus</option>
+                        <option value="09">September</option>
+                        <option value="10" selected>Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Desember</option>
+                    </select>
+                </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <label>Pilih Tahun</label>
+                    <select id="filter-tahun-pelanggan" onchange="muatTransaksi()">
+                        <option value="2025">2025</option>
+                        <option value="2026" selected>2026</option>
+                        <option value="2027">2027</option>
+                    </select>
+                </div>
+            </div>
+
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
@@ -182,7 +211,36 @@
                 </div>
                 <button type="submit" class="btn-submit">Simpan Pengeluaran</button>
             </form>
-            <h3>Daftar Pengeluaran</h3>
+            
+            <h3>Daftar Pengeluaran Bulanan</h3>
+            <div style="display: flex; gap: 15px; margin: 15px 0 20px 0; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 150px;">
+                    <label>Pilih Bulan</label>
+                    <select id="filter-bulan-pengeluaran" onchange="muatPengeluaran()">
+                        <option value="01">Januari</option>
+                        <option value="02">Februari</option>
+                        <option value="03">Maret</option>
+                        <option value="04">April</option>
+                        <option value="05">Mei</option>
+                        <option value="06">Juni</option>
+                        <option value="07">Juli</option>
+                        <option value="08">Agustus</option>
+                        <option value="09">September</option>
+                        <option value="10" selected>Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Desember</option>
+                    </select>
+                </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <label>Pilih Tahun</label>
+                    <select id="filter-tahun-pengeluaran" onchange="muatPengeluaran()">
+                        <option value="2025">2025</option>
+                        <option value="2026" selected>2026</option>
+                        <option value="2027">2027</option>
+                    </select>
+                </div>
+            </div>
+
             <div style="overflow-x: auto;">
                 <table>
                     <thead><tr><th>Tanggal</th><th>Keterangan</th><th>Total</th><th>Sumber</th><th>Aksi</th></tr></thead>
@@ -191,10 +249,38 @@
             </div>
         </div>
 
-        <!-- TAB 4: CASHFLOW -->
+        <!-- TAB 4: CASHFLOW (BULANAN) -->
         <div id="cashflow" class="tab-content">
-            <h3 style="margin-bottom: 20px;">Ringkasan Cashflow Keuangan</h3>
+            <h3 style="margin-bottom: 20px;">Ringkasan Cashflow Keuangan Bulanan</h3>
             
+            <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 150px;">
+                    <label>Pilih Bulan</label>
+                    <select id="filter-bulan-cashflow" onchange="muatCashflow()">
+                        <option value="01">Januari</option>
+                        <option value="02">Februari</option>
+                        <option value="03">Maret</option>
+                        <option value="04">April</option>
+                        <option value="05">Mei</option>
+                        <option value="06">Juni</option>
+                        <option value="07">Juli</option>
+                        <option value="08">Agustus</option>
+                        <option value="09">September</option>
+                        <option value="10" selected>Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Desember</option>
+                    </select>
+                </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <label>Pilih Tahun</label>
+                    <select id="filter-tahun-cashflow" onchange="muatCashflow()">
+                        <option value="2025">2025</option>
+                        <option value="2026" selected>2026</option>
+                        <option value="2027">2027</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="card" style="margin-bottom: 15px;">
                 <h4 style="color: #bdc3c7; font-size: 13px; margin-bottom: 8px;">Total Pemasukan</h4>
                 <div class="value" id="cf-pemasukan" style="font-size: 20px; font-weight: bold; color: #2ecc71;">Rp 0</div>
@@ -211,7 +297,7 @@
             </div>
 
             <div class="card" style="margin-bottom: 25px;">
-                <h4 style="color: #bdc3c7; font-size: 13px; margin-bottom: 8px;">Pendapatan Bersih</h4>
+                <h4 style="color: #bdc3c7; font-size: 13px; margin-bottom: 8px;">Pendapatan Bersih (Setelah Pengeluaran Usaha & Pribadi)</h4>
                 <div class="value" id="cf-pendapatan-bersih" style="font-size: 20px; font-weight: bold; color: #3498db;">Rp 0</div>
             </div>
 
@@ -528,18 +614,46 @@
             hitungTotal();
         }
 
+        function parseBulanTahun(tanggalStr) {
+            if (!tanggalStr) return null;
+            let parts = tanggalStr.split(/[\/\-]/);
+            if (parts.length >= 3) {
+                let y, m;
+                if (parts[0].length === 4) {
+                    y = parts[0];
+                    m = parts[1];
+                } else if (parts[2].length === 4) {
+                    y = parts[2];
+                    m = parts[1];
+                }
+                if (y && m) {
+                    return { tahun: parseInt(y), bulan: parseInt(m) };
+                }
+            }
+            return null;
+        }
+
         function muatTransaksi() {
+            const bulan = document.getElementById('filter-bulan-pelanggan').value;
+            const tahun = document.getElementById('filter-tahun-pelanggan').value;
+
             fetch(SCRIPT_URL + "?action=get_transaksi")
             .then(res => res.json())
             .then(data => {
                 daftarTransaksi = data;
                 const tbody = document.getElementById('tabel-pelanggan-body');
                 tbody.innerHTML = '';
-                if(data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="8" style="text-align: center;">Belum ada data.</td></tr>`;
+
+                let filtered = data.filter(t => {
+                    let dt = parseBulanTahun(t.tanggal);
+                    return dt && dt.tahun == tahun && String(dt.bulan).padStart(2, '0') === bulan;
+                });
+
+                if(filtered.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" style="text-align: center;">Tidak ada data transaksi pada bulan ini.</td></tr>`;
                     return;
                 }
-                data.forEach((t) => {
+                filtered.forEach((t) => {
                     tbody.innerHTML += `
                         <tr>
                             <td>${t.tanggal}</td>
@@ -638,17 +752,26 @@
         }
 
         function muatPengeluaran() {
+            const bulan = document.getElementById('filter-bulan-pengeluaran').value;
+            const tahun = document.getElementById('filter-tahun-pengeluaran').value;
+
             fetch(SCRIPT_URL + "?action=get_pengeluaran")
             .then(res => res.json())
             .then(data => {
                 daftarPengeluaran = data;
                 const tbody = document.getElementById('tabel-pengeluaran-body');
                 tbody.innerHTML = '';
-                if(data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Belum ada pengeluaran.</td></tr>`;
+
+                let filtered = data.filter(p => {
+                    let dt = parseBulanTahun(p.tanggal);
+                    return dt && dt.tahun == tahun && String(dt.bulan).padStart(2, '0') === bulan;
+                });
+
+                if(filtered.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Tidak ada pengeluaran pada bulan ini.</td></tr>`;
                     return;
                 }
-                data.forEach(p => {
+                filtered.forEach(p => {
                     tbody.innerHTML += `
                         <tr>
                             <td>${p.tanggal}</td>
@@ -712,14 +835,38 @@
         }
 
         function muatCashflow() {
-            fetch(SCRIPT_URL + "?action=get_cashflow")
-            .then(res => res.json())
-            .then(data => {
-                const pemasukan = parseFloat(data.pemasukan) || 0;
-                const pengeluaranKas = parseFloat(data.pengeluaranKas) || 0;
-                const pengeluaranPribadi = parseFloat(data.pengeluaranPribadi) || 0;
-                const pendapatanBersih = parseFloat(data.pendapatanBersih) || 0;
-                const totalPengeluaran = pengeluaranKas + pengeluaranPribadi;
+            const bulan = document.getElementById('filter-bulan-cashflow').value;
+            const tahun = document.getElementById('filter-tahun-cashflow').value;
+
+            Promise.all([
+                fetch(SCRIPT_URL + "?action=get_transaksi").then(res => res.json()),
+                fetch(SCRIPT_URL + "?action=get_pengeluaran").then(res => res.json())
+            ]).then(([transaksiData, pengeluaranData]) => {
+                let pemasukan = 0;
+                let pengeluaranKas = 0;
+                let pengeluaranPribadi = 0;
+
+                transaksiData.forEach(t => {
+                    let dt = parseBulanTahun(t.tanggal);
+                    if (dt && dt.tahun == tahun && String(dt.bulan).padStart(2, '0') === bulan) {
+                        pemasukan += parseFloat(t.total) || 0;
+                    }
+                });
+
+                pengeluaranData.forEach(p => {
+                    let dt = parseBulanTahun(p.tanggal);
+                    if (dt && dt.tahun == tahun && String(dt.bulan).padStart(2, '0') === bulan) {
+                        let nominal = parseFloat(p.totalHarga) || 0;
+                        if (p.sumberDana === 'Pribadi') {
+                            pengeluaranPribadi += nominal;
+                        } else {
+                            pengeluaranKas += nominal;
+                        }
+                    }
+                });
+
+                let totalPengeluaran = pengeluaranKas + pengeluaranPribadi;
+                let pendapatanBersih = pemasukan - totalPengeluaran;
 
                 document.getElementById('cf-pemasukan').innerText = 'Rp ' + pemasukan.toLocaleString('id-ID');
                 document.getElementById('cf-pengeluaran-kas').innerText = 'Rp ' + pengeluaranKas.toLocaleString('id-ID');
@@ -736,25 +883,6 @@
                 document.getElementById('progress-pemasukan').style.width = pctPemasukan + '%';
                 document.getElementById('progress-pengeluaran').style.width = pctPengeluaran + '%';
             });
-        }
-
-        function parseBulanTahun(tanggalStr) {
-            if (!tanggalStr) return null;
-            let parts = tanggalStr.split(/[\/\-]/);
-            if (parts.length >= 3) {
-                let y, m;
-                if (parts[0].length === 4) {
-                    y = parts[0];
-                    m = parts[1];
-                } else if (parts[2].length === 4) {
-                    y = parts[2];
-                    m = parts[1];
-                }
-                if (y && m) {
-                    return { tahun: parseInt(y), bulan: parseInt(m) };
-                }
-            }
-            return null;
         }
 
         function muatLaporanBulanan() {
