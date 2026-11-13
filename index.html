@@ -240,11 +240,11 @@
             </div>
         </div>
 
-        <!-- TAB 5: LAPORAN BULANAN (BARU) -->
+        <!-- TAB 5: LAPORAN BULANAN (MATRIKS DETAIL BULANAN) -->
         <div id="laporan" class="tab-content">
-            <h3>Laporan Keuangan Bulanan</h3>
+            <h3>Laporan Cash Flow Bulanan</h3>
             
-            <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+            <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
                 <div style="flex: 1; min-width: 150px;">
                     <label>Pilih Bulan</label>
                     <select id="filter-bulan" onchange="muatLaporanBulanan()">
@@ -257,8 +257,8 @@
                         <option value="07">Juli</option>
                         <option value="08">Agustus</option>
                         <option value="09">September</option>
-                        <option value="10">Oktober</option>
-                        <option value="11" selected>November</option>
+                        <option value="10" selected>Oktober</option>
+                        <option value="11">November</option>
                         <option value="12">Desember</option>
                     </select>
                 </div>
@@ -274,7 +274,7 @@
 
             <div class="card-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
                 <div class="card">
-                    <h4 style="color: #bdc3c7; font-size: 13px; margin-bottom: 8px;">Pemasukan Bulan Ini</h4>
+                    <h4 style="color: #bdc3c7; font-size: 13px; margin-bottom: 8px;">Total Pemasukan</h4>
                     <div class="value" id="lap-pemasukan" style="font-size: 20px; font-weight: bold; color: #2ecc71;">Rp 0</div>
                 </div>
                 <div class="card">
@@ -286,25 +286,29 @@
                     <div class="value" id="lap-pengeluaran-pribadi" style="font-size: 20px; font-weight: bold; color: #f39c12;">Rp 0</div>
                 </div>
                 <div class="card">
-                    <h4 style="color: #bdc3c7; font-size: 13px; margin-bottom: 8px;">Pendapatan Bersih</h4>
+                    <h4 style="color: #bdc3c7; font-size: 13px; margin-bottom: 8px;">Pendapatan Bersih Akhir</h4>
                     <div class="value" id="lap-pendapatan-bersih" style="font-size: 20px; font-weight: bold; color: #3498db;">Rp 0</div>
                 </div>
             </div>
 
-            <h4 style="color: #2ecc71; margin-bottom: 10px;">Ringkasan Transaksi Bulan Ini</h4>
+            <div class="card" style="margin-bottom: 25px; border-color: #2ecc71; background: rgba(46, 204, 113, 0.05);">
+                <h4 style="color: #2ecc71; font-size: 14px; margin-bottom: 5px;">Jumlah yang Harus Ditransfer ke Dana Pribadi</h4>
+                <div style="font-size: 20px; font-weight: bold; color: #fff;" id="lap-rekomendasi-transfer">Rp 0</div>
+                <p style="font-size: 11px; color: #bdc3c7; margin-top: 4px;">(Hanya sebesar total pengeluaran berjenis pribadi pada bulan ini)</p>
+            </div>
+
+            <h4 style="color: #2ecc71; margin-bottom: 10px;">Rincian Cash Flow Bulanan</h4>
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
-                        <tr>
-                            <th>Tanggal</th>
-                            <th>Nama Pelanggan</th>
-                            <th>Layanan</th>
-                            <th>Total</th>
-                            <th>Status</th>
+                        <tr style="background: #2b2d2f;">
+                            <th>Kategori / Keterangan</th>
+                            <th>Jenis</th>
+                            <th>Total Nominal</th>
                         </tr>
                     </thead>
                     <tbody id="tabel-laporan-body">
-                        <tr><td colspan="5" style="text-align: center;">Memuat laporan...</td></tr>
+                        <tr><td colspan="3" style="text-align: center;">Memuat rincian bulanan...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -734,9 +738,28 @@
             });
         }
 
+        function parseBulanTahun(tanggalStr) {
+            if (!tanggalStr) return null;
+            let parts = tanggalStr.split(/[\/\-]/);
+            if (parts.length >= 3) {
+                let y, m;
+                if (parts[0].length === 4) {
+                    y = parts[0];
+                    m = parts[1];
+                } else if (parts[2].length === 4) {
+                    y = parts[2];
+                    m = parts[1];
+                }
+                if (y && m) {
+                    return { tahun: parseInt(y), bulan: parseInt(m) };
+                }
+            }
+            return null;
+        }
+
         function muatLaporanBulanan() {
-            const bulan = document.getElementById('filter-bulan').value; // Contoh: "10"
-            const tahun = document.getElementById('filter-tahun').value; // Contoh: "2026"
+            const bulan = document.getElementById('filter-bulan').value;
+            const tahun = document.getElementById('filter-tahun').value;
 
             Promise.all([
                 fetch(SCRIPT_URL + "?action=get_transaksi").then(res => res.json()),
@@ -745,71 +768,90 @@
                 let totalPemasukanBulan = 0;
                 let totalKasUsahaBulan = 0;
                 let totalPribadiBulan = 0;
-                let filteredTransaksi = [];
-
-                // Helper untuk mencocokkan bulan & tahun secara fleksibel (Format YYYY-MM atau DD/MM/YYYY)
-                function isMatchBulanTahun(tanggalStr) {
-                    if (!tanggalStr) return false;
-                    // Jika format mengandung YYYY-MM
-                    if (tanggalStr.includes(`${tahun}-${bulan}`) || tanggalStr.includes(`${bulan}/${tahun}`)) {
-                        return true;
-                    }
-                    // Jika format dipisah slash / strip (misal DD/MM/YYYY atau YYYY/MM/DD)
-                    let parts = tanggalStr.split(/[\/\-]/);
-                    if (parts.length >= 3) {
-                        // Cek apakah ada bagian yang cocok dengan tahun dan bulan
-                        if ((parts[0] === tahun && parts[1] === bulan) || (parts[2] === tahun && parts[1] === bulan)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
+                
+                let rincianPemasukan = {};
+                let rincianPengeluaran = [];
 
                 transaksiData.forEach(t => {
-                    if (isMatchBulanTahun(t.tanggal)) {
-                        totalPemasukanBulan += parseFloat(t.total) || 0;
-                        filteredTransaksi.push(t);
+                    let dt = parseBulanTahun(t.tanggal);
+                    if (dt && dt.tahun == tahun && String(dt.bulan).padStart(2, '0') === bulan) {
+                        let nominal = parseFloat(t.total) || 0;
+                        totalPemasukanBulan += nominal;
+
+                        let layananClean = t.layanan ? t.layanan.replace(/<[^>]*>?/gm, '').trim() : 'Layanan Cleaning';
+                        if (!rincianPemasukan[layananClean]) {
+                            rincianPemasukan[layananClean] = 0;
+                        }
+                        rincianPemasukan[layananClean] += nominal;
                     }
                 });
 
                 pengeluaranData.forEach(p => {
-                    if (isMatchBulanTahun(p.tanggal)) {
+                    let dt = parseBulanTahun(p.tanggal);
+                    if (dt && dt.tahun == tahun && String(dt.bulan).padStart(2, '0') === bulan) {
                         let nominal = parseFloat(p.totalHarga) || 0;
                         if (p.sumberDana === 'Pribadi') {
                             totalPribadiBulan += nominal;
                         } else {
                             totalKasUsahaBulan += nominal;
                         }
+                        rincianPengeluaran.push(p);
                     }
                 });
 
-                let pendapatanBersihBulan = totalPemasukanBulan - totalKasUsahaBulan;
+                // Perhitungan Laba Bersih Usaha & Pendapatan Bersih Akhir
+                let labaBersihUsaha = totalPemasukanBulan - totalKasUsahaBulan;
+                let pendapatanBersihAkhir = labaBersihUsaha - totalPribadiBulan;
+                
+                // JUMLAH TRANSFER KE DANA PRIBADI HANYA BERASAL DARI TOTAL PENGELUARAN PRIBADI
+                let jumlahTransferPribadi = totalPribadiBulan;
 
                 document.getElementById('lap-pemasukan').innerText = 'Rp ' + totalPemasukanBulan.toLocaleString('id-ID');
                 document.getElementById('lap-pengeluaran-kas').innerText = 'Rp ' + totalKasUsahaBulan.toLocaleString('id-ID');
                 document.getElementById('lap-pengeluaran-pribadi').innerText = 'Rp ' + totalPribadiBulan.toLocaleString('id-ID');
-                document.getElementById('lap-pendapatan-bersih').innerText = 'Rp ' + pendapatanBersihBulan.toLocaleString('id-ID');
+                document.getElementById('lap-pendapatan-bersih').innerText = 'Rp ' + pendapatanBersihAkhir.toLocaleString('id-ID');
+                document.getElementById('lap-rekomendasi-transfer').innerText = 'Rp ' + jumlahTransferPribadi.toLocaleString('id-ID');
 
-                const tbody = document.getElementById('tabel-laporan-body');
+                let tbody = document.getElementById('tabel-laporan-body');
                 tbody.innerHTML = '';
-                if(filteredTransaksi.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Tidak ada transaksi pada bulan ini.</td></tr>`;
-                    return;
-                }
 
-                filteredTransaksi.forEach(t => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${t.tanggal}</td>
-                            <td>${t.nama}</td>
-                            <td>${t.layanan.replace(/<br>/g, ', ')}</td>
-                            <td>Rp ${parseFloat(t.total).toLocaleString('id-ID')}</td>
-                            <td>${t.status}</td>
-                        </tr>
-                    `;
+                // Header Pemasukan
+                tbody.innerHTML += `<tr style="background: rgba(46, 204, 113, 0.15); color: #2ecc71; font-weight: bold;"><td colspan="3">PEMASUKAN (CASH IN)</td></tr>`;
+                
+                let hasIncome = false;
+                for (let key in rincianPemasukan) {
+                    hasIncome = true;
+                    tbody.innerHTML += `<tr><td>${key}</td><td>Pemasukan Usaha</td><td>Rp ${rincianPemasukan[key].toLocaleString('id-ID')}</td></tr>`;
+                }
+                if (!hasIncome) {
+                    tbody.innerHTML += `<tr><td colspan="3" style="text-align: center; color: #7f8c8d;">Tidak ada pemasukan pada bulan ini</td></tr>`;
+                }
+                tbody.innerHTML += `<tr style="font-weight: bold; background: #252729;"><td>Total Pemasukan</td><td>-</td><td style="color: #2ecc71;">Rp ${totalPemasukanBulan.toLocaleString('id-ID')}</td></tr>`;
+
+                // Header Pengeluaran
+                tbody.innerHTML += `<tr style="background: rgba(231, 76, 60, 0.15); color: #e74c3c; font-weight: bold;"><td colspan="3">PENGELUARAN (CASH OUT)</td></tr>`;
+                
+                let hasExpense = false;
+                rincianPengeluaran.forEach(p => {
+                    hasExpense = true;
+                    let sumberLabel = p.sumberDana === 'Pribadi' ? 'Pengeluaran Pribadi' : 'Kas Usaha';
+                    let warnaSumber = p.sumberDana === 'Pribadi' ? '#f39c12' : '#e74c3c';
+                    tbody.innerHTML += `<tr><td>${p.keterangan} (${p.tanggal})</td><td style="color: ${warnaSumber};">${sumberLabel}</td><td>Rp ${parseFloat(p.totalHarga).toLocaleString('id-ID')}</td></tr>`;
                 });
+                if (!hasExpense) {
+                    tbody.innerHTML += `<tr><td colspan="3" style="text-align: center; color: #7f8c8d;">Tidak ada pengeluaran pada bulan ini</td></tr>`;
+                }
+                tbody.innerHTML += `<tr style="font-weight: bold; background: #252729;"><td>Total Pengeluaran (Usaha & Pribadi)</td><td>-</td><td style="color: #e74c3c;">Rp ${(totalKasUsahaBulan + totalPribadiBulan).toLocaleString('id-ID')}</td></tr>`;
+
+                // Ringkasan Akhir
+                tbody.innerHTML += `<tr style="background: rgba(52, 152, 219, 0.15); color: #3498db; font-weight: bold; font-size: 14px;">
+                    <td>PENDAPATAN BERSIH AKHIR (Setelah Kurang Pribadi)</td>
+                    <td>Net Profit</td>
+                    <td>Rp ${pendapatanBersihAkhir.toLocaleString('id-ID')}</td>
+                </tr>`;
             });
         }
+
         function bukaNotaBaru(rowIndex) {
             const t = daftarTransaksi.find(item => item.rowIndex === rowIndex);
             if(!t) return;
