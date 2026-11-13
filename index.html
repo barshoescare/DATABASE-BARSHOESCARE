@@ -735,9 +735,8 @@
         }
 
         function muatLaporanBulanan() {
-            const bulan = document.getElementById('filter-bulan').value;
-            const tahun = document.getElementById('filter-tahun').value;
-            const targetBulanTahun = `${tahun}-${bulan}`; // Format YYYY-MM
+            const bulan = document.getElementById('filter-bulan').value; // Contoh: "10"
+            const tahun = document.getElementById('filter-tahun').value; // Contoh: "2026"
 
             Promise.all([
                 fetch(SCRIPT_URL + "?action=get_transaksi").then(res => res.json()),
@@ -748,16 +747,33 @@
                 let totalPribadiBulan = 0;
                 let filteredTransaksi = [];
 
+                // Helper untuk mencocokkan bulan & tahun secara fleksibel (Format YYYY-MM atau DD/MM/YYYY)
+                function isMatchBulanTahun(tanggalStr) {
+                    if (!tanggalStr) return false;
+                    // Jika format mengandung YYYY-MM
+                    if (tanggalStr.includes(`${tahun}-${bulan}`) || tanggalStr.includes(`${bulan}/${tahun}`)) {
+                        return true;
+                    }
+                    // Jika format dipisah slash / strip (misal DD/MM/YYYY atau YYYY/MM/DD)
+                    let parts = tanggalStr.split(/[\/\-]/);
+                    if (parts.length >= 3) {
+                        // Cek apakah ada bagian yang cocok dengan tahun dan bulan
+                        if ((parts[0] === tahun && parts[1] === bulan) || (parts[2] === tahun && parts[1] === bulan)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
                 transaksiData.forEach(t => {
-                    // t.tanggal format umumnya YYYY-MM-DD atau DD/MM/YYYY
-                    if (t.tanggal && t.tanggal.includes(targetBulanTahun)) {
+                    if (isMatchBulanTahun(t.tanggal)) {
                         totalPemasukanBulan += parseFloat(t.total) || 0;
                         filteredTransaksi.push(t);
                     }
                 });
 
                 pengeluaranData.forEach(p => {
-                    if (p.tanggal && p.tanggal.includes(targetBulanTahun)) {
+                    if (isMatchBulanTahun(p.tanggal)) {
                         let nominal = parseFloat(p.totalHarga) || 0;
                         if (p.sumberDana === 'Pribadi') {
                             totalPribadiBulan += nominal;
@@ -794,7 +810,6 @@
                 });
             });
         }
-
         function bukaNotaBaru(rowIndex) {
             const t = daftarTransaksi.find(item => item.rowIndex === rowIndex);
             if(!t) return;
