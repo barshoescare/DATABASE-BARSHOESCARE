@@ -36,14 +36,18 @@
         table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; min-width: 600px; }
         th, td { padding: 10px; text-align: left; border-bottom: 1px solid #7f8c8d; }
         th { color: #2ecc71; }
-        .btn-delete { background-color: #e74c3c; color: white; border: none; padding: 5px 8px; border-radius: 3px; cursor: pointer; }
-        .btn-edit { background-color: #f39c12; color: white; border: none; padding: 5px 8px; border-radius: 3px; cursor: pointer; margin-right: 3px; }
-        .btn-print { background-color: #3498db; color: white; border: none; padding: 5px 8px; border-radius: 3px; cursor: pointer; margin-right: 3px; }
+        .btn-delete { background-color: #e74c3c; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-delete:hover { background-color: #c0392b; }
+        .btn-edit { background-color: #f39c12; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 3px; }
+        .btn-edit:hover { background-color: #d35400; }
+        .btn-print { background-color: #3498db; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 3px; }
+        .btn-print:hover { background-color: #2980b9; }
 
-        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .card { background: #1e1e1e; border: 1px solid #7f8c8d; border-radius: 8px; padding: 15px; text-align: center; }
-        .card h4 { color: #bdc3c7; font-size: 13px; margin-bottom: 8px; }
-        .card .value { font-size: 20px; font-weight: bold; color: #2ecc71; }
+        .card { background: #1e1e1e; border: 1px solid #7f8c8d; border-radius: 8px; padding: 15px; }
+
+        /* Modal Edit Transaksi & Pengeluaran */
+        #modal-edit, #modal-edit-pengeluaran { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; padding: 15px; }
+        .modal-box { background: #2b2d2f; padding: 25px; border-radius: 8px; width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; border: 1px solid #7f8c8d; }
 
         @media screen and (max-width: 768px) {
             body { flex-direction: column; }
@@ -71,6 +75,7 @@
         <button class="menu-btn" onclick="openTab('pelanggan')">Data Pelanggan</button>
         <button class="menu-btn" onclick="openTab('pengeluaran')">Input Pengeluaran</button>
         <button class="menu-btn" onclick="openTab('cashflow')">Cashflow</button>
+        <button class="menu-btn" onclick="openTab('laporan')">Laporan Bulanan</button>
         <button class="menu-btn" onclick="openTab('promo')">Kelola Promo</button>
     </div>
 
@@ -188,15 +193,124 @@
 
         <!-- TAB 4: CASHFLOW -->
         <div id="cashflow" class="tab-content">
-            <h3>Ringkasan Cashflow Keuangan</h3>
-            <div class="card-grid">
-                <div class="card"><h4>Total Pemasukan</h4><div class="value" id="cf-pemasukan">Rp 0</div></div>
-                <div class="card"><h4>Pengeluaran Usaha</h4><div class="value" id="cf-pengeluaran-kas" style="color: #e74c3c;">Rp 0</div></div>
-                <div class="card"><h4>Pendapatan Bersih</h4><div class="value" id="cf-pendapatan-bersih">Rp 0</div></div>
+            <h3 style="margin-bottom: 20px;">Ringkasan Cashflow Keuangan</h3>
+            
+            <div class="card" style="margin-bottom: 15px;">
+                <h4 style="color: #bdc3c7; font-size: 13px; margin-bottom: 8px;">Total Pemasukan</h4>
+                <div class="value" id="cf-pemasukan" style="font-size: 20px; font-weight: bold; color: #2ecc71;">Rp 0</div>
+            </div>
+            
+            <div class="card" style="margin-bottom: 15px;">
+                <h4 style="color: #bdc3c7; font-size: 13px; margin-bottom: 8px;">Pengeluaran Kas Usaha</h4>
+                <div class="value" id="cf-pengeluaran-kas" style="font-size: 20px; font-weight: bold; color: #e74c3c;">Rp 0</div>
+            </div>
+
+            <div class="card" style="margin-bottom: 15px;">
+                <h4 style="color: #bdc3c7; font-size: 13px; margin-bottom: 8px;">Pengeluaran Pribadi</h4>
+                <div class="value" id="cf-pengeluaran-pribadi" style="font-size: 20px; font-weight: bold; color: #f39c12;">Rp 0</div>
+            </div>
+
+            <div class="card" style="margin-bottom: 25px;">
+                <h4 style="color: #bdc3c7; font-size: 13px; margin-bottom: 8px;">Pendapatan Bersih</h4>
+                <div class="value" id="cf-pendapatan-bersih" style="font-size: 20px; font-weight: bold; color: #3498db;">Rp 0</div>
+            </div>
+
+            <div class="card">
+                <h4 style="color: #2ecc71; font-size: 14px; margin-bottom: 15px;">Grafik Perbandingan Keuangan</h4>
+                
+                <div style="margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;">
+                        <span style="color: #bdc3c7;">Total Pemasukan</span>
+                        <span id="bar-val-pemasukan" style="color: #fff; font-weight: bold;">Rp 0</span>
+                    </div>
+                    <div style="background: #1e1e1e; border-radius: 4px; height: 12px; overflow: hidden; border: 1px solid #444;">
+                        <div id="progress-pemasukan" style="background: #2ecc71; width: 0%; height: 100%; transition: width 0.3s;"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;">
+                        <span style="color: #bdc3c7;">Total Pengeluaran (Kas Usaha & Pribadi)</span>
+                        <span id="bar-val-pengeluaran" style="color: #fff; font-weight: bold;">Rp 0</span>
+                    </div>
+                    <div style="background: #1e1e1e; border-radius: 4px; height: 12px; overflow: hidden; border: 1px solid #444;">
+                        <div id="progress-pengeluaran" style="background: #e74c3c; width: 0%; height: 100%; transition: width 0.3s;"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- TAB 5: KELOLA PROMO -->
+        <!-- TAB 5: LAPORAN BULANAN (BARU) -->
+        <div id="laporan" class="tab-content">
+            <h3>Laporan Keuangan Bulanan</h3>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 150px;">
+                    <label>Pilih Bulan</label>
+                    <select id="filter-bulan" onchange="muatLaporanBulanan()">
+                        <option value="01">Januari</option>
+                        <option value="02">Februari</option>
+                        <option value="03">Maret</option>
+                        <option value="04">April</option>
+                        <option value="05">Mei</option>
+                        <option value="06">Juni</option>
+                        <option value="07">Juli</option>
+                        <option value="08">Agustus</option>
+                        <option value="09">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11" selected>November</option>
+                        <option value="12">Desember</option>
+                    </select>
+                </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <label>Pilih Tahun</label>
+                    <select id="filter-tahun" onchange="muatLaporanBulanan()">
+                        <option value="2025">2025</option>
+                        <option value="2026" selected>2026</option>
+                        <option value="2027">2027</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
+                <div class="card">
+                    <h4 style="color: #bdc3c7; font-size: 13px; margin-bottom: 8px;">Pemasukan Bulan Ini</h4>
+                    <div class="value" id="lap-pemasukan" style="font-size: 20px; font-weight: bold; color: #2ecc71;">Rp 0</div>
+                </div>
+                <div class="card">
+                    <h4 style="color: #bdc3c7; font-size: 13px; margin-bottom: 8px;">Pengeluaran Usaha</h4>
+                    <div class="value" id="lap-pengeluaran-kas" style="font-size: 20px; font-weight: bold; color: #e74c3c;">Rp 0</div>
+                </div>
+                <div class="card">
+                    <h4 style="color: #bdc3c7; font-size: 13px; margin-bottom: 8px;">Pengeluaran Pribadi</h4>
+                    <div class="value" id="lap-pengeluaran-pribadi" style="font-size: 20px; font-weight: bold; color: #f39c12;">Rp 0</div>
+                </div>
+                <div class="card">
+                    <h4 style="color: #bdc3c7; font-size: 13px; margin-bottom: 8px;">Pendapatan Bersih</h4>
+                    <div class="value" id="lap-pendapatan-bersih" style="font-size: 20px; font-weight: bold; color: #3498db;">Rp 0</div>
+                </div>
+            </div>
+
+            <h4 style="color: #2ecc71; margin-bottom: 10px;">Ringkasan Transaksi Bulan Ini</h4>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Nama Pelanggan</th>
+                            <th>Layanan</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabel-laporan-body">
+                        <tr><td colspan="5" style="text-align: center;">Memuat laporan...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 6: KELOLA PROMO -->
         <div id="promo" class="tab-content">
             <h3>Tambah Promo Baru</h3>
             <form id="form-promo" onsubmit="tambahPromo(event)" style="margin-bottom: 30px;">
@@ -212,7 +326,51 @@
 
     </div>
 
-    <!-- AREA TEMPLAT INVOICE (GAMBAR) -->
+    <!-- MODAL EDIT TRANSAKSI -->
+    <div id="modal-edit">
+        <div class="modal-box">
+            <h3>Edit Data Pelanggan</h3>
+            <form id="form-edit" onsubmit="simpanEditTransaksi(event)">
+                <input type="hidden" id="edit-rowindex">
+                <div class="form-group"><label>Nama Pelanggan</label><input type="text" id="edit-nama" required></div>
+                <div class="form-group"><label>No WhatsApp</label><input type="text" id="edit-nowa" required></div>
+                <div class="form-group"><label>Warna / Brand</label><input type="text" id="edit-warna" required></div>
+                <div class="form-group"><label>Total Tagihan (Rp)</label><input type="number" id="edit-total" required></div>
+                <div class="form-group">
+                    <label>Status Pembayaran</label>
+                    <select id="edit-status">
+                        <option value="PAID">PAID</option>
+                        <option value="UNPAID">UNPAID</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-submit">Simpan Perubahan</button>
+                <button type="button" class="btn-delete" style="width:100%; margin-top:10px;" onclick="tutupModalEdit()">Batal</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL EDIT PENGELUARAN -->
+    <div id="modal-edit-pengeluaran">
+        <div class="modal-box">
+            <h3>Edit Pengeluaran</h3>
+            <form id="form-edit-pengeluaran" onsubmit="simpanEditPengeluaran(event)">
+                <input type="hidden" id="edit-pengeluaran-rowindex">
+                <div class="form-group"><label>Keterangan</label><input type="text" id="edit-ket-pengeluaran" required></div>
+                <div class="form-group"><label>Total Harga (Rp)</label><input type="number" id="edit-total-pengeluaran" required></div>
+                <div class="form-group">
+                    <label>Sumber Dana</label>
+                    <select id="edit-sumber-dana" required>
+                        <option value="Pribadi">Pribadi</option>
+                        <option value="Tidak">Tidak (Kas Usaha)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-submit">Simpan Perubahan</button>
+                <button type="button" class="btn-delete" style="width:100%; margin-top:10px;" onclick="tutupModalEditPengeluaran()">Batal</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- AREA TEMPLAT INVOICE (DIKUNCI & TIDAK DIUBAH) -->
     <div id="print-area">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
             <h1 style="font-size: 24px; font-weight: bold; letter-spacing: 0.5px; white-space: nowrap;">
@@ -239,7 +397,6 @@
             <span>AMOUNT</span>
         </div>
 
-        <!-- Daftar Item Kiri-Kanan -->
         <div id="print-items-list" style="margin-bottom: 15px;"></div>
 
         <div id="row-oneday" style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; color: #bdc3c7; display: none;">
@@ -298,6 +455,7 @@
             if(tabName === 'pelanggan') muatTransaksi();
             else if(tabName === 'pengeluaran') muatPengeluaran();
             else if(tabName === 'cashflow') muatCashflow();
+            else if(tabName === 'laporan') muatLaporanBulanan();
         }
 
         function tambahBarisItem(layananVal = 'Standar Cleaning', qtyVal = 1) {
@@ -387,10 +545,91 @@
                             <td>${t.layanan.replace(/<br>/g, ', ')}</td>
                             <td>Rp ${parseFloat(t.total).toLocaleString('id-ID')}</td>
                             <td>${t.status}</td>
-                            <td><button class="btn-print" onclick="bukaNotaBaru(${t.rowIndex})">Nota</button></td>
+                            <td>
+                                <button class="btn-print" onclick="bukaNotaBaru(${t.rowIndex})">Nota</button>
+                                <button class="btn-edit" onclick="bukaModalEdit(${t.rowIndex})">Edit</button>
+                                <button class="btn-delete" onclick="hapusTransaksi(${t.rowIndex})">Hapus</button>
+                            </td>
                         </tr>
                     `;
                 });
+            });
+        }
+
+        function hapusTransaksi(rowIndex) {
+            if(confirm('Yakin ingin menghapus data pelanggan ini?')) {
+                fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ type: "hapus_transaksi", rowIndex: rowIndex }) })
+                .then(() => {
+                    alert('Data berhasil dihapus!');
+                    muatTransaksi();
+                });
+            }
+        }
+
+        function bukaModalEdit(rowIndex) {
+            const t = daftarTransaksi.find(item => item.rowIndex === rowIndex);
+            if(!t) return;
+
+            document.getElementById('edit-rowindex').value = t.rowIndex;
+            document.getElementById('edit-nama').value = t.nama;
+            document.getElementById('edit-nowa').value = t.nowa;
+            document.getElementById('edit-warna').value = t.warna;
+            document.getElementById('edit-total').value = t.total;
+            document.getElementById('edit-status').value = t.status || 'PAID';
+
+            document.getElementById('modal-edit').style.display = 'flex';
+        }
+
+        function tutupModalEdit() {
+            document.getElementById('modal-edit').style.display = 'none';
+        }
+
+        function simpanEditTransaksi(event) {
+            event.preventDefault();
+            const rowIndex = parseInt(document.getElementById('edit-rowindex').value);
+            const t = daftarTransaksi.find(item => item.rowIndex === rowIndex);
+            if(!t) return;
+
+            const data = {
+                type: "edit_transaksi",
+                rowIndex: rowIndex,
+                nama: document.getElementById('edit-nama').value,
+                nowa: document.getElementById('edit-nowa').value,
+                warna: document.getElementById('edit-warna').value,
+                layanan: t.layanan,
+                harga: t.harga,
+                oneday: t.oneday,
+                promo: t.promo,
+                total: parseFloat(document.getElementById('edit-total').value),
+                status: document.getElementById('edit-status').value
+            };
+
+            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
+            .then(() => {
+                alert('Data pelanggan berhasil diperbarui!');
+                tutupModalEdit();
+                muatTransaksi();
+            });
+        }
+
+        function simpanPengeluaran(event) {
+            event.preventDefault();
+            const ket = document.getElementById('ket-pengeluaran').value;
+            const total = document.getElementById('total-pengeluaran').value;
+            const sumber = document.getElementById('sumber-dana').value;
+
+            const data = {
+                type: "pengeluaran",
+                keterangan: ket,
+                totalHarga: total,
+                sumberDana: sumber
+            };
+
+            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
+            .then(() => {
+                alert('Pengeluaran berhasil disimpan!');
+                document.getElementById('form-pengeluaran').reset();
+                muatPengeluaran();
             });
         }
 
@@ -398,11 +637,73 @@
             fetch(SCRIPT_URL + "?action=get_pengeluaran")
             .then(res => res.json())
             .then(data => {
+                daftarPengeluaran = data;
                 const tbody = document.getElementById('tabel-pengeluaran-body');
                 tbody.innerHTML = '';
+                if(data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Belum ada pengeluaran.</td></tr>`;
+                    return;
+                }
                 data.forEach(p => {
-                    tbody.innerHTML += `<tr><td>${p.tanggal}</td><td>${p.keterangan}</td><td>Rp ${parseFloat(p.totalHarga).toLocaleString('id-ID')}</td><td>${p.sumberDana}</td><td>-</td></tr>`;
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${p.tanggal}</td>
+                            <td>${p.keterangan}</td>
+                            <td>Rp ${parseFloat(p.totalHarga).toLocaleString('id-ID')}</td>
+                            <td>${p.sumberDana}</td>
+                            <td>
+                                <button class="btn-edit" onclick="bukaModalEditPengeluaran(${p.rowIndex})">Edit</button>
+                                <button class="btn-delete" onclick="hapusPengeluaran(${p.rowIndex})">Hapus</button>
+                            </td>
+                        </tr>
+                    `;
                 });
+            });
+        }
+
+        function hapusPengeluaran(rowIndex) {
+            if(confirm('Yakin ingin menghapus data pengeluaran ini?')) {
+                fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ type: "hapus_pengeluaran", rowIndex: rowIndex }) })
+                .then(() => {
+                    alert('Pengeluaran berhasil dihapus!');
+                    muatPengeluaran();
+                });
+            }
+        }
+
+        function bukaModalEditPengeluaran(rowIndex) {
+            const p = daftarPengeluaran.find(item => item.rowIndex === rowIndex);
+            if(!p) return;
+
+            document.getElementById('edit-pengeluaran-rowindex').value = p.rowIndex;
+            document.getElementById('edit-ket-pengeluaran').value = p.keterangan;
+            document.getElementById('edit-total-pengeluaran').value = p.totalHarga;
+            document.getElementById('edit-sumber-dana').value = p.sumberDana;
+
+            document.getElementById('modal-edit-pengeluaran').style.display = 'flex';
+        }
+
+        function tutupModalEditPengeluaran() {
+            document.getElementById('modal-edit-pengeluaran').style.display = 'none';
+        }
+
+        function simpanEditPengeluaran(event) {
+            event.preventDefault();
+            const rowIndex = parseInt(document.getElementById('edit-pengeluaran-rowindex').value);
+
+            const data = {
+                type: "edit_pengeluaran",
+                rowIndex: rowIndex,
+                keterangan: document.getElementById('edit-ket-pengeluaran').value,
+                totalHarga: parseFloat(document.getElementById('edit-total-pengeluaran').value),
+                sumberDana: document.getElementById('edit-sumber-dana').value
+            };
+
+            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
+            .then(() => {
+                alert('Pengeluaran berhasil diperbarui!');
+                tutupModalEditPengeluaran();
+                muatPengeluaran();
             });
         }
 
@@ -410,9 +711,87 @@
             fetch(SCRIPT_URL + "?action=get_cashflow")
             .then(res => res.json())
             .then(data => {
-                document.getElementById('cf-pemasukan').innerText = 'Rp ' + data.pemasukan.toLocaleString('id-ID');
-                document.getElementById('cf-pengeluaran-kas').innerText = 'Rp ' + data.pengeluaranKas.toLocaleString('id-ID');
-                document.getElementById('cf-pendapatan-bersih').innerText = 'Rp ' + data.pendapatanBersih.toLocaleString('id-ID');
+                const pemasukan = parseFloat(data.pemasukan) || 0;
+                const pengeluaranKas = parseFloat(data.pengeluaranKas) || 0;
+                const pengeluaranPribadi = parseFloat(data.pengeluaranPribadi) || 0;
+                const pendapatanBersih = parseFloat(data.pendapatanBersih) || 0;
+                const totalPengeluaran = pengeluaranKas + pengeluaranPribadi;
+
+                document.getElementById('cf-pemasukan').innerText = 'Rp ' + pemasukan.toLocaleString('id-ID');
+                document.getElementById('cf-pengeluaran-kas').innerText = 'Rp ' + pengeluaranKas.toLocaleString('id-ID');
+                document.getElementById('cf-pengeluaran-pribadi').innerText = 'Rp ' + pengeluaranPribadi.toLocaleString('id-ID');
+                document.getElementById('cf-pendapatan-bersih').innerText = 'Rp ' + pendapatanBersih.toLocaleString('id-ID');
+
+                document.getElementById('bar-val-pemasukan').innerText = 'Rp ' + pemasukan.toLocaleString('id-ID');
+                document.getElementById('bar-val-pengeluaran').innerText = 'Rp ' + totalPengeluaran.toLocaleString('id-ID');
+
+                const maxVal = Math.max(pemasukan, totalPengeluaran, 1);
+                const pctPemasukan = (pemasukan / maxVal) * 100;
+                const pctPengeluaran = (totalPengeluaran / maxVal) * 100;
+
+                document.getElementById('progress-pemasukan').style.width = pctPemasukan + '%';
+                document.getElementById('progress-pengeluaran').style.width = pctPengeluaran + '%';
+            });
+        }
+
+        function muatLaporanBulanan() {
+            const bulan = document.getElementById('filter-bulan').value;
+            const tahun = document.getElementById('filter-tahun').value;
+            const targetBulanTahun = `${tahun}-${bulan}`; // Format YYYY-MM
+
+            Promise.all([
+                fetch(SCRIPT_URL + "?action=get_transaksi").then(res => res.json()),
+                fetch(SCRIPT_URL + "?action=get_pengeluaran").then(res => res.json())
+            ]).then(([transaksiData, pengeluaranData]) => {
+                let totalPemasukanBulan = 0;
+                let totalKasUsahaBulan = 0;
+                let totalPribadiBulan = 0;
+                let filteredTransaksi = [];
+
+                transaksiData.forEach(t => {
+                    // t.tanggal format umumnya YYYY-MM-DD atau DD/MM/YYYY
+                    if (t.tanggal && t.tanggal.includes(targetBulanTahun)) {
+                        totalPemasukanBulan += parseFloat(t.total) || 0;
+                        filteredTransaksi.push(t);
+                    }
+                });
+
+                pengeluaranData.forEach(p => {
+                    if (p.tanggal && p.tanggal.includes(targetBulanTahun)) {
+                        let nominal = parseFloat(p.totalHarga) || 0;
+                        if (p.sumberDana === 'Pribadi') {
+                            totalPribadiBulan += nominal;
+                        } else {
+                            totalKasUsahaBulan += nominal;
+                        }
+                    }
+                });
+
+                let pendapatanBersihBulan = totalPemasukanBulan - totalKasUsahaBulan;
+
+                document.getElementById('lap-pemasukan').innerText = 'Rp ' + totalPemasukanBulan.toLocaleString('id-ID');
+                document.getElementById('lap-pengeluaran-kas').innerText = 'Rp ' + totalKasUsahaBulan.toLocaleString('id-ID');
+                document.getElementById('lap-pengeluaran-pribadi').innerText = 'Rp ' + totalPribadiBulan.toLocaleString('id-ID');
+                document.getElementById('lap-pendapatan-bersih').innerText = 'Rp ' + pendapatanBersihBulan.toLocaleString('id-ID');
+
+                const tbody = document.getElementById('tabel-laporan-body');
+                tbody.innerHTML = '';
+                if(filteredTransaksi.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Tidak ada transaksi pada bulan ini.</td></tr>`;
+                    return;
+                }
+
+                filteredTransaksi.forEach(t => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${t.tanggal}</td>
+                            <td>${t.nama}</td>
+                            <td>${t.layanan.replace(/<br>/g, ', ')}</td>
+                            <td>Rp ${parseFloat(t.total).toLocaleString('id-ID')}</td>
+                            <td>${t.status}</td>
+                        </tr>
+                    `;
+                });
             });
         }
 
